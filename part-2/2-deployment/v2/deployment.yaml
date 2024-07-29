@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-v2-deployment
+  labels:
+    app: app-v2-deployment
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-v2-deployment
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: app-v2-deployment
+        version: v2
+    spec:
+      containers:
+        - name: app-v2
+          image: erkanozsoy/app-v2:v1.0.0
+          imagePullPolicy: Always

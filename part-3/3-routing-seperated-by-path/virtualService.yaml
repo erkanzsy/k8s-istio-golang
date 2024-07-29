@@ -1,0 +1,48 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app-virtual-service-seperated-by-path
+spec:
+  hosts:
+    - "seperated-by-path.box"
+  gateways:
+    - app-gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/seperate"
+      route:
+        - destination:
+            host: app-v1-service
+            subset: v1
+            port:
+              number: 3000
+          weight: 90
+        - destination:
+            host: app-v2-service
+            subset: v2
+            port:
+              number: 3001
+          weight: 10
+    - match:
+        - uri:
+            prefix: "/v2"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: app-v2-service
+            subset: v2
+            port:
+              number: 3001
+    - match:
+        - uri:
+            exact: "/v1/exact-match/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: app-v1-service
+            subset: v1
+            port:
+              number: 3000

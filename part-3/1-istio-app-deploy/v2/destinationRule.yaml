@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule #The type of resource to create (in this case, a DestinationRule).
+metadata:
+  name: app-v2-destination-rule # Unique name of the DestinationRule
+spec:
+  host: app-v2-service
+  subsets:
+    - name: v2
+      labels:
+        version: v2

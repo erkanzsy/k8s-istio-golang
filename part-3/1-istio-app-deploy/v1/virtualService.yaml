@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app-v1-virtual-service # Unique name of the VirtualService
+spec:
+  hosts:
+    - "app-v1.box" # The external hostname for this service
+  gateways:
+    - app-gateway # The gateway this service is exposed through
+  http:
+    - route:
+        - destination:
+            host: app-v1-service # Name of the service to route to
+            subset: v1 # Subset of the service to route to
+            port:
+              number: 3000
