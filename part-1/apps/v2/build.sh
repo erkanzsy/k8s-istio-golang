@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="v1.0.1"
+VERSION="v1.0.2"
 USERNAME=erkanozsoy
 
 docker build --tag app-v2:$VERSION .

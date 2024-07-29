@@ -15,7 +15,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		hostname, _ := os.Hostname()
 		response := map[string]string{
-			"version":   "V1",
+			"version":   "V2",
 			"path":      r.URL.Path,
 			"client_ip": r.RemoteAddr,
 			"hostname":  hostname,

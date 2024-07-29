@@ -15,20 +15,16 @@ spec:
         - destination:
             host: app-v1-service
             subset: v1
-            port:
-              number: 3000
-          weight: 90
+          weight: 40
         - destination:
             host: app-v2-service
             subset: v2
-            port:
-              number: 3001
-          weight: 10
+          weight: 60
     - match:
         - uri:
             prefix: "/v2"
       rewrite:
-        uri: "/"
+        uri: "/v2-prefix-rewrited"
       route:
         - destination:
             host: app-v2-service
@@ -37,9 +33,7 @@ spec:
               number: 3001
     - match:
         - uri:
-            exact: "/v1/exact-match/"
-      rewrite:
-        uri: "/"
+            prefix: "/v1"
       route:
         - destination:
             host: app-v1-service

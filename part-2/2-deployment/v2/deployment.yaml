@@ -19,5 +19,5 @@ spec:
     spec:
       containers:
         - name: app-v2
-          image: erkanozsoy/app-v2:v1.0.0
+          image: erkanozsoy/app-v2:v1.0.2
           imagePullPolicy: Always
