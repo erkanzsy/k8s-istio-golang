@@ -1,191 +1,198 @@
 version: "3"
 
 env:
-    VERSION: "v1.0.4"
-    USERNAME: erkanozsoy # Change this to your DockerHub username
+  VERSION: "v1.0.4"
+  USERNAME: erkanozsoy # search and change this with DockerHub username
 
 tasks:
-    #part-1
-    part-1-app-v1-run:
-        desc: "Run v1 go app locally"
-        dir: '{{.USER_WORKING_DIR}}/part-1/apps/v1/'
-        cmds:
-            - go run main.go
+  #common
+  docker-login:
+    desc: "Login to DockerHub"
+    cmds:
+      - docker login
 
-    part-1-app-v2-run:
-        desc: "Run v2 go app locally"
-        dir: '{{.USER_WORKING_DIR}}/part-1/apps/v2/'
-        cmds:
-            - go run main.go
+  #part-1
+  part-1-app-v1-run:
+    desc: "Run v1 go app locally"
+    dir: '{{.USER_WORKING_DIR}}/part-1/apps/v1/'
+    cmds:
+      - go run main.go
 
-    part-1-app-v1-push-tag:
-        desc: "Build and push v1 go app and run it from docker locally"
-        dir: '{{.USER_WORKING_DIR}}/part-1/apps/v1/'
-        cmds:
-            - docker build --tag app-v1:$VERSION .
-            - docker tag app-v1:$VERSION $USERNAME/app-v1:$VERSION
-            - docker push $USERNAME/app-v1:$VERSION
-            - docker run -d -p 3000:3000 $USERNAME/app-v1:$VERSION
-            - open http://localhost:3000
+  part-1-app-v2-run:
+    desc: "Run v2 go app locally"
+    dir: '{{.USER_WORKING_DIR}}/part-1/apps/v2/'
+    cmds:
+      - go run main.go
 
-    part-1-app-v2-push-tag:
-        desc: "Build and push v2 go app and run it from docker locally"
-        dir: '{{.USER_WORKING_DIR}}/part-1/apps/v2/'
-        cmds:
-            - docker build --tag app-v2:$VERSION .
-            - docker tag app-v2:$VERSION $USERNAME/app-v2:$VERSION
-            - docker push $USERNAME/app-v2:$VERSION
-            - docker run -d -p 3001:3001 $USERNAME/app-v2:$VERSION
-            - open http://localhost:3001
+  part-1-app-v1-push-tag:
+    desc: "Build and push v1 go app and run it from docker locally"
+    dir: '{{.USER_WORKING_DIR}}/part-1/apps/v1/'
+    cmds:
+      - docker build --tag app-v1:$VERSION .
+      - docker tag app-v1:$VERSION $USERNAME/app-v1:$VERSION
+      - docker push $USERNAME/app-v1:$VERSION
+      - docker run -d -p 3000:3000 $USERNAME/app-v1:$VERSION
+      - open http://localhost:3000
 
-    #part-2
-    part-2-install-kubectl:
-        desc: "Install kubectl"
-        cmds:
-            - brew install kubectl
+  part-1-app-v2-push-tag:
+    desc: "Build and push v2 go app and run it from docker locally"
+    dir: '{{.USER_WORKING_DIR}}/part-1/apps/v2/'
+    cmds:
+      - docker build --tag app-v2:$VERSION .
+      - docker tag app-v2:$VERSION $USERNAME/app-v2:$VERSION
+      - docker push $USERNAME/app-v2:$VERSION
+      - docker run -d -p 3001:3001 $USERNAME/app-v2:$VERSION
+      - open http://localhost:3001
 
-    part-2-install-minikube:
-        desc: "Install minikube"
-        cmds:
-            - brew install minikube
-            - minikube start
+  #part-2
+  part-2-install-kubectl:
+    desc: "Install kubectl"
+    cmds:
+      - brew install kubectl
 
-    part-2-start-minikube:
-        desc: "Start minikube"
-        cmds:
-            - minikube dashboard
+  part-2-install-minikube:
+    desc: "Install minikube"
+    cmds:
+      - brew install minikube
 
-    part-2-pod-app-v1:
-        desc: "Deploy app-v1 to minikube as pod"
-        dir: '{{.USER_WORKING_DIR}}/part-2/1-pod/'
-        cmds:
-            - kubectl apply -f pod.yaml
-            - kubectl get pods
+  part-2-start-minikube:
+    desc: "Start minikube"
+    cmds:
+      - minikube start
+      - minikube dashboard
 
-    part-2-inside-pod-app-v1:
-        desc: "Run a command inside app-v1 pod"
-        cmds:
-            - kubectl exec --stdin --tty app-v1 -- /bin/sh
-            #- apk add curl
-            #- curl localhost:3000
+  part-2-pod-app-v1:
+    desc: "Deploy app-v1 to minikube as pod"
+    dir: '{{.USER_WORKING_DIR}}/part-2/1-pod/'
+    cmds:
+      - kubectl apply -f pod.yaml
+      - kubectl get pods
 
-    part-2-delete-pod-app-v1:
-        desc: "Delete app-v1 pod"
-        dir: '{{.USER_WORKING_DIR}}/part-2/1-pod/'
-        cmds:
-            - kubectl delete -f pod.yaml
+  part-2-inside-pod-app-v1:
+    desc: "Run a command inside app-v1 pod"
+    cmds:
+      - kubectl exec --stdin --tty app-v1 -- /bin/sh
+      #- apk add curl
+      #- curl localhost:3000
 
-    part-2-deployment-app-v1:
-        desc: "Deploy app-v1 to minikube as deployment"
-        dir: '{{.USER_WORKING_DIR}}/part-2/2-deployment/'
-        cmds:
-            - kubectl apply -f v1
+  part-2-delete-pod-app-v1:
+    desc: "Delete app-v1 pod"
+    dir: '{{.USER_WORKING_DIR}}/part-2/1-pod/'
+    cmds:
+      - kubectl delete -f pod.yaml
 
-    part-2-deployment-app-v2:
-        desc: "Deploy app-v2 to minikube as deployment"
-        dir: '{{.USER_WORKING_DIR}}/part-2/2-deployment/'
-        cmds:
-            - kubectl apply -f v2
+  part-2-deployment-app-v1:
+    desc: "Deploy app-v1 to minikube as deployment"
+    dir: '{{.USER_WORKING_DIR}}/part-2/2-deployment/'
+    cmds:
+      - kubectl apply -f v1
 
-    part-2-service-list:
-        desc: "List services"
-        cmds:
-            - minikube service list
+  part-2-deployment-app-v2:
+    desc: "Deploy app-v2 to minikube as deployment"
+    dir: '{{.USER_WORKING_DIR}}/part-2/2-deployment/'
+    cmds:
+      - kubectl apply -f v2
 
-    part-2-service-app-v1:
-        desc: "Expose app-v1 deployment as service"
-        cmds:
-            - minikube service app-v1-service
+  part-2-service-list:
+    desc: "List services"
+    cmds:
+      - minikube service list
 
-    part-2-service-app-v2:
-        desc: "Expose app-v2 deployment as service"
-        cmds:
-            - minikube service app-v2-service
+  part-2-service-app-v1:
+    desc: "Expose app-v1 deployment as service"
+    cmds:
+      - minikube service app-v1-service
 
-    part-2-delete-deployments:
-        desc: "Delete app-v1 and app-v2 deployments"
-        cmds:
-            - kubectl delete deployments --all -n default
+  part-2-service-app-v2:
+    desc: "Expose app-v2 deployment as service"
+    cmds:
+      - minikube service app-v2-service
 
-    #part-3
-    part-3-install-istioctl:
-        desc: "Install istioctl"
-        cmds:
-            - brew install istioctl
-            - kubectl label namespace default istio-injection=enabled
+  part-2-delete-deployments:
+    desc: "Delete app-v1 and app-v2 deployments"
+    cmds:
+      - kubectl delete services --all -n default || true
+      - kubectl delete deployments --all -n default || true
 
-    part-3-add-hosts:
-        desc: "Add hosts to /etc/hosts"
-        cmds:
-            - sudo sh -c 'echo "127.0.0.1 app-v1.box\n127.0.0.1 app-v2.box\n127.0.0.1 seperated-by-query-params.box\n127.0.0.1 seperated-by-path.box\n127.0.0.1 response-headers.box" >> /etc/hosts'
+  #part-3
+  part-3-install-istioctl:
+    desc: "Install istioctl"
+    cmds:
+      - brew install istioctl
+      - kubectl label namespace default istio-injection=enabled
 
-    part-3-applying-gateway:
-        desc: "Applying gateway"
-        dir: '{{.USER_WORKING_DIR}}/part-3/'
-        cmds:
-            - istioctl install --set profile=default
-            - kubectl apply -f gateway.yaml
+  part-3-add-hosts:
+    desc: "Add hosts to /etc/hosts"
+    cmds:
+      - sudo sh -c 'echo "127.0.0.1 app-v1.box\n127.0.0.1 app-v2.box\n127.0.0.1 seperated-by-query-params.box\n127.0.0.1 seperated-by-path.box\n127.0.0.1 response-headers.box" >> /etc/hosts'
 
-    part-3-minikube-tunnel:
-        desc: "Start minikube tunnel"
-        cmds:
-            - minikube tunnel
+  part-3-applying-gateway:
+    desc: "Applying gateway"
+    dir: '{{.USER_WORKING_DIR}}/part-3/'
+    cmds:
+      - istioctl install --set profile=default
+      - kubectl apply -f gateway.yaml
 
-    part-3-istio-app-deploy-v1:
-        desc: "Deploy app-v1 to minikube as deployment"
-        dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
-        cmds:
-            - task: part-2-deployment-app-v1 # must be run before this task
-            - kubectl apply -f v1
-            - sleep 2
-            - open -a "Google Chrome" "http://app-v1.box"
+  part-3-minikube-tunnel:
+    desc: "Start minikube tunnel"
+    cmds:
+      - minikube tunnel
 
-    part-3-istio-app-deploy-v2:
-        desc: "Deploy app-v2 to minikube as deployment"
-        dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
-        cmds:
-            - task: part-2-deployment-app-v2 # must be run before this task
-            - kubectl apply -f v2
-            - sleep 2
-            - open -a "Google Chrome" "http://app-v2.box"
+  part-3-istio-app-deploy-v1:
+    desc: "Deploy app-v1 to minikube as deployment"
+    dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
+    cmds:
+      - task: part-2-deployment-app-v1 # must be run before this task
+      - kubectl apply -f v1
+      - sleep 2
+      - open -a "Google Chrome" "http://app-v1.box"
 
-    part-3-istio-app-deploy-seperated-by-query-params:
-        desc: "Deployment example seperated by query params"
-        dir: '{{.USER_WORKING_DIR}}/part-3/2-routing-seperated-by-query-params/'
-        cmds:
-            - task: part-2-deployment-app-v1
-            - task: part-2-deployment-app-v2
-            - kubectl apply -f virtualService.yaml
-            - sleep 2
-            - open -a "Google Chrome" "http://seperated-by-query-params.box"
-            - open -a "Google Chrome" "http://seperated-by-query-params.box?platform=mobile"
+  part-3-istio-app-deploy-v2:
+    desc: "Deploy app-v2 to minikube as deployment"
+    dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
+    cmds:
+      - task: part-2-deployment-app-v2 # must be run before this task
+      - kubectl apply -f v2
+      - sleep 2
+      - open -a "Google Chrome" "http://app-v2.box"
 
-    part-3-istio-app-deploy-seperated-by-path:
-        desc: "Deployment example seperated by path"
-        dir: '{{.USER_WORKING_DIR}}/part-3/3-routing-seperated-by-path/'
-        cmds:
-            - task: part-2-deployment-app-v1
-            - task: part-2-deployment-app-v2
-            - kubectl apply -f virtualService.yaml
-            - sleep 2
-            - open -a "Google Chrome" "http://seperated-by-path.box/seperated"
-            - open -a "Google Chrome" "http://seperated-by-path.box/v2"
-            - open -a "Google Chrome" "http://seperated-by-path.box/v1"
+  part-3-istio-app-deploy-seperated-by-query-params:
+    desc: "Deployment example seperated by query params"
+    dir: '{{.USER_WORKING_DIR}}/part-3/2-routing-seperated-by-query-params/'
+    cmds:
+      - task: part-2-deployment-app-v1
+      - task: part-2-deployment-app-v2
+      - kubectl apply -f virtualService.yaml
+      - sleep 2
+      - open -a "Google Chrome" "http://seperated-by-query-params.box"
+      - open -a "Google Chrome" "http://seperated-by-query-params.box?platform=mobile"
 
-    part-3-istio-app-deploy-modify-response-headers:
-        desc: "Deployment example seperated by path"
-        dir: '{{.USER_WORKING_DIR}}/part-3/4-modify-response-headers/'
-        cmds:
-            - task: part-2-deployment-app-v1
-            - kubectl apply -f virtualService.yaml
-            - sleep 2
-            - curl -sS -D - http://response-headers.box -o /dev/null
+  part-3-istio-app-deploy-seperated-by-path:
+    desc: "Deployment example seperated by path"
+    dir: '{{.USER_WORKING_DIR}}/part-3/3-routing-seperated-by-path/'
+    cmds:
+      - task: part-2-deployment-app-v1
+      - task: part-2-deployment-app-v2
+      - kubectl apply -f virtualService.yaml
+      - sleep 2
+      - open -a "Google Chrome" "http://seperated-by-path.box/seperated"
+      - open -a "Google Chrome" "http://seperated-by-path.box/v2-rewrited"
+      - open -a "Google Chrome" "http://seperated-by-path.box/v1/exact-match/"
 
-    part-3-delete-all:
-        desc: "Delete all"
-        cmds:
-            - cd '{{.USER_WORKING_DIR}}/part-3/3-routing-seperated-by-path/' && kubectl delete -f virtualService.yaml
-            - cd '{{.USER_WORKING_DIR}}/part-3/2-routing-seperated-by-query-params/' && kubectl delete -f virtualService.yaml
-            - cd '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/' && kubectl delete -f v1 && kubectl delete -f v2
-            - cd '{{.USER_WORKING_DIR}}/part-3/' && kubectl delete -f gateway.yaml
-            - task: part-2-delete-deployments
+  part-3-istio-app-deploy-modify-response-headers:
+    desc: "Deployment example seperated by path"
+    dir: '{{.USER_WORKING_DIR}}/part-3/4-modify-response-headers/'
+    cmds:
+      - task: part-2-deployment-app-v1
+      - kubectl apply -f virtualService.yaml
+      - sleep 2
+      - curl -sS -D - http://response-headers.box -o /dev/null
+
+  part-3-delete-all:
+    desc: "Delete all"
+    cmds:
+      - cd '{{.USER_WORKING_DIR}}/part-3/3-routing-seperated-by-path/' && kubectl delete -f virtualService.yaml || true
+      - cd '{{.USER_WORKING_DIR}}/part-3/2-routing-seperated-by-query-params/' && kubectl delete -f virtualService.yaml || true
+      - cd '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/' && kubectl delete -f v1 && kubectl delete -f v2 || true
+      - cd '{{.USER_WORKING_DIR}}/part-3/' && kubectl delete -f gateway.yaml || true
+      - task: part-2-delete-deployments

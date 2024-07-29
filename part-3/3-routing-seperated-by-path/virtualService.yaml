@@ -22,7 +22,7 @@ spec:
           weight: 60
     - match:
         - uri:
-            prefix: "/v2"
+            prefix: "/v2-rewrited"
       rewrite:
         uri: "/v2-prefix-rewrited"
       route:
@@ -33,7 +33,9 @@ spec:
               number: 3001
     - match:
         - uri:
-            prefix: "/v1"
+            exact: "/v1/exact-match/"
+      rewrite:
+        uri: "/v1-exact-match-rewrited/"
       route:
         - destination:
             host: app-v1-service
