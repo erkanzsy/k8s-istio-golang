@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
     - name: app-v1
-      image: erkanozsoy/app-v1:v1.0.1
+      image: erkanozsoy/app-v1:v1.0.4
       imagePullPolicy: Always
       ports:
         - containerPort: 3000

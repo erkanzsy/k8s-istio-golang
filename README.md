@@ -17,3 +17,8 @@
   * Gateway
   * VirtualService
   * DestinationRule
+
+
+```bash
+brew install go-task
+```
