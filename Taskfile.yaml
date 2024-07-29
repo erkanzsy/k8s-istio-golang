@@ -11,6 +11,27 @@ tasks:
     cmds:
       - docker login
 
+  install-kubectl:
+    desc: "Install kubectl"
+    cmds:
+      - brew install kubectl
+
+  install-minikube:
+    desc: "Install minikube"
+    cmds:
+      - brew install minikube
+
+  install-istioctl:
+    desc: "Install istioctl"
+    cmds:
+      - brew install istioctl
+      - kubectl label namespace default istio-injection=enabled
+
+  add-hosts:
+    desc: "Add hosts to /etc/hosts"
+    cmds:
+      - sudo sh -c 'echo "127.0.0.1 app-v1.box\n127.0.0.1 app-v2.box\n127.0.0.1 seperated-by-query-params.box\n127.0.0.1 seperated-by-path.box\n127.0.0.1 response-headers.box" >> /etc/hosts'
+
   #part-1
   part-1-app-v1-run:
     desc: "Run v1 go app locally"
@@ -45,23 +66,13 @@ tasks:
       - open http://localhost:3001
 
   #part-2
-  part-2-install-kubectl:
-    desc: "Install kubectl"
-    cmds:
-      - brew install kubectl
-
-  part-2-install-minikube:
-    desc: "Install minikube"
-    cmds:
-      - brew install minikube
-
   part-2-start-minikube:
     desc: "Start minikube"
     cmds:
       - minikube start
       - minikube dashboard
 
-  part-2-pod-app-v1:
+  part-2-deploy-app-v1:
     desc: "Deploy app-v1 to minikube as pod"
     dir: '{{.USER_WORKING_DIR}}/part-2/1-pod/'
     cmds:
@@ -98,34 +109,23 @@ tasks:
     cmds:
       - minikube service list
 
-  part-2-service-app-v1:
+  part-2-expose-app-v1:
     desc: "Expose app-v1 deployment as service"
     cmds:
       - minikube service app-v1-service
 
-  part-2-service-app-v2:
+  part-2-expose-app-v2:
     desc: "Expose app-v2 deployment as service"
     cmds:
       - minikube service app-v2-service
 
-  part-2-delete-deployments:
-    desc: "Delete app-v1 and app-v2 deployments"
+  part-2-delete-all:
+    desc: "Delete app-v1 and app-v2 services and deployments"
     cmds:
       - kubectl delete services --all -n default || true
       - kubectl delete deployments --all -n default || true
 
   #part-3
-  part-3-install-istioctl:
-    desc: "Install istioctl"
-    cmds:
-      - brew install istioctl
-      - kubectl label namespace default istio-injection=enabled
-
-  part-3-add-hosts:
-    desc: "Add hosts to /etc/hosts"
-    cmds:
-      - sudo sh -c 'echo "127.0.0.1 app-v1.box\n127.0.0.1 app-v2.box\n127.0.0.1 seperated-by-query-params.box\n127.0.0.1 seperated-by-path.box\n127.0.0.1 response-headers.box" >> /etc/hosts'
-
   part-3-applying-gateway:
     desc: "Applying gateway"
     dir: '{{.USER_WORKING_DIR}}/part-3/'
@@ -139,16 +139,16 @@ tasks:
       - minikube tunnel
 
   part-3-istio-app-deploy-v1:
-    desc: "Deploy app-v1 to minikube as deployment"
+    desc: "Istio App Deployment v1"
     dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
     cmds:
-      - task: part-2-deployment-app-v1 # must be run before this task
+      - task: part-2-deployment-app-v1
       - kubectl apply -f v1
       - sleep 2
       - open -a "Google Chrome" "http://app-v1.box"
 
   part-3-istio-app-deploy-v2:
-    desc: "Deploy app-v2 to minikube as deployment"
+    desc: "Istio App Deployment v2"
     dir: '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/'
     cmds:
       - task: part-2-deployment-app-v2 # must be run before this task
@@ -195,4 +195,4 @@ tasks:
       - cd '{{.USER_WORKING_DIR}}/part-3/2-routing-seperated-by-query-params/' && kubectl delete -f virtualService.yaml || true
       - cd '{{.USER_WORKING_DIR}}/part-3/1-istio-app-deploy/' && kubectl delete -f v1 && kubectl delete -f v2 || true
       - cd '{{.USER_WORKING_DIR}}/part-3/' && kubectl delete -f gateway.yaml || true
-      - task: part-2-delete-deployments
+      - task: part-2-delete-all
